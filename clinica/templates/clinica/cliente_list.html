@@ -1,0 +1,12 @@
+{% extends 'clinica/base.html' %}
+{% block content %}
+<h2>Listado de Clientes</h2>
+<a href="{% url 'cliente_create' %}" class="btn btn-primary mb-3">Añadir Cliente</a>
+<ul class="list-group mb-3">
+    {% for cliente in page_obj %}
+        <li class="list-group-item">{{ cliente.nombre }} - DNI: {{ cliente.dni }}</li>
+    {% empty %}
+        <li class="list-group-item">No hay clientes.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

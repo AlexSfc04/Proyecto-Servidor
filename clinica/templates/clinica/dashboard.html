@@ -1,0 +1,86 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Panel de Estadísticas</h2>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card p-3 shadow-sm"><canvas id="graficoEspecies"></canvas></div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card p-3 shadow-sm"><canvas id="graficoCitasAnillo"></canvas></div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card p-3 shadow-sm"><canvas id="graficoVolumen"></canvas></div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-3 shadow-sm"><canvas id="graficoCitasBarras"></canvas></div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-3 shadow-sm text-center">
+            <h4>Peso Medio General</h4>
+            <h1 class="display-1 text-primary mt-3">{{ peso_medio }} kg</h1>
+            <canvas id="graficoPeso"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Procesamos los datos que vienen desde views.py
+    const especiesData = {{ especies_stats|safe }};
+    const citasData = {{ citas_stats|safe }};
+    const totalMascotas = {{ total_mascotas }};
+    const totalClientes = {{ total_clientes }};
+    const pesoMedio = {{ peso_medio|safe|default:"0" }};
+
+    // 1. Gráfico de Especies (Pie)
+    new Chart(document.getElementById('graficoEspecies'), {
+        type: 'pie',
+        data: {
+            labels: especiesData.map(d => d.especie),
+            datasets: [{ label: 'Cantidad', data: especiesData.map(d => d.total), backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'] }]
+        },
+        options: { plugins: { title: { display: true, text: 'Mascotas por Especie' } } }
+    });
+
+    // 2. Gráfico de Citas (Doughnut)
+    new Chart(document.getElementById('graficoCitasAnillo'), {
+        type: 'doughnut',
+        data: {
+            labels: citasData.map(d => d.estado),
+            datasets: [{ label: 'Citas', data: citasData.map(d => d.total), backgroundColor: ['#FF9F40', '#4BC0C0', '#FF6384'] }]
+        },
+        options: { plugins: { title: { display: true, text: 'Estado de las Citas' } } }
+    });
+
+    // 3. Gráfico Mascotas vs Clientes (Bar)
+    new Chart(document.getElementById('graficoVolumen'), {
+        type: 'bar',
+        data: {
+            labels: ['Mascotas', 'Clientes'],
+            datasets: [{ label: 'Total Registrado', data: [totalMascotas, totalClientes], backgroundColor: ['#36A2EB', '#9966FF'] }]
+        },
+        options: { plugins: { title: { display: true, text: 'Volumen de Registros' } } }
+    });
+
+    // 4. Gráfico de Citas (Barras Horizontales)
+    new Chart(document.getElementById('graficoCitasBarras'), {
+        type: 'bar',
+        data: {
+            labels: citasData.map(d => d.estado),
+            datasets: [{ label: 'Volumen de citas', data: citasData.map(d => d.total), backgroundColor: '#4BC0C0' }]
+        },
+        options: { indexAxis: 'y', plugins: { title: { display: true, text: 'Volumen de Citas por Estado' } } }
+    });
+
+    // 5. Gráfico Decorativo para Peso Medio (Gráfico de línea/área sencillo simulando evolución)
+    new Chart(document.getElementById('graficoPeso'), {
+        type: 'line',
+        data: {
+            labels: ['Mes 1', 'Mes 2', 'Mes 3', 'Actual'], // Datos simulados para ilustrar el peso actual
+            datasets: [{ label: 'Evolución de peso medio', data: [pesoMedio-2, pesoMedio-1, pesoMedio+1, pesoMedio], borderColor: '#FF6384', fill: true, backgroundColor: 'rgba(255, 99, 132, 0.2)' }]
+        },
+        options: { plugins: { title: { display: true, text: 'Tendencia del Peso Medio' } } }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'clinica/base.html' %}
+{% block content %}
+<h2>{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} Cita</h2>
+<form method="post" class="card p-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+{% endblock %}
